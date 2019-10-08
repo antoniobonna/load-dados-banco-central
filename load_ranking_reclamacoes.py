@@ -8,13 +8,19 @@ Created on Thu Oct  3 10:34:30 2019
 import os
 import pandas as pd
 import csv
+import credentials
+import psycopg2
+from subprocess import call
 
 ### Definicao das variaveis
-indir = '/home/postgres/dump/dados_banco_central/ranking_reclamacoes/'
-outdir = '/home/postgres/scripts/load-dados-banco-central/parsed/'
+indir = '/home/ubuntu/dump/dados_banco_central/ranking_reclamacoes/'
+outdir = '/home/ubuntu/scripts/load-dados-banco-central/parsed/'
 files = [('ranking_mais_4M.csv','new_ranking_mais_4M.csv'),
          ('ranking_menos_4M.csv','new_ranking_menos_4M.csv')]
 folders = [f for f in os.listdir(indir) if os.path.isdir(indir+f)]
+tablename = 'dados_banco_central.ranking_reclamacoes_stg'
+
+DATABASE, HOST, USER, PASSWORD = credentials.setDatabaseLogin()
 
 ### funcao que cria data no formato banco de dados
 def create_date(folder):
@@ -64,16 +70,26 @@ for (file,new_file) in files:
             date = create_date(folder)
             with open(indir+folder+'/'+file, 'r', encoding="utf-8") as ifile:
                 for row in csv.reader(ifile, delimiter='\t'):
-                    row[0] = row[0].replace('º','').strip()
+                    if row[0]:
+                        rank = row[0].replace('º','').strip()
+                    row[0] = rank
                     row[1] = norm_banks(row[1])
                     ### padrao numerico ENG-US
-                    row[2] = row[2].replace(',','.')
+                    row[2] = row[2].replace('.','').replace(',','.')
                     row[3] = row[3].replace('.','')
                     row[4] = row[4].replace(',','')
                     row.insert(0,date)
                     writer.writerow(row)
-    ### fill down na coluna rank
-    df = pd.read_csv(outdir+new_file, sep = ';', header=None)
-    df = df.ffill()
-    df.to_csv(outdir+file, encoding='utf-8', sep=';', index=False, header=False)
-    os.remove(outdir+new_file)
+    ### conecta no banco de dados
+    db_conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(DATABASE, USER, HOST, PASSWORD))
+    cursor = db_conn.cursor()
+    print('Connected to the database')
+    ### copy
+    with open(outdir+new_file, 'r') as ifile:
+        cursor.copy_from(ifile, tablename, sep=';')
+        db_conn.commit()
+    cursor.close()
+    db_conn.close()
+
+### VACUUM ANALYZE
+call('psql -d torkcapital -c "VACUUM VERBOSE ANALYZE dados_banco_central.ranking_reclamacoes_stg";',shell=True)

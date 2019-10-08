@@ -8,13 +8,20 @@ Created on Fri Oct  4 15:03:20 2019
 import os
 import csv
 from collections import OrderedDict
+import credentials
+import psycopg2
+from subprocess import call
 
 ### Definicao das variaveis
-indir = '/home/postgres/dump/dados_banco_central/if.data/'
-outdir = '/home/postgres/scripts/load-dados-banco-central/parsed/'
+indir = '/home/ubuntu/dump/dados_banco_central/if.data/'
+outdir = '/home/ubuntu/scripts/load-dados-banco-central/parsed/'
 new_file = 'resumo.csv'
 files = [f for f in os.listdir(indir) if os.path.isfile(indir+f) and 'resumo' in f]
 columns = ['Instituição financeira','Código','Conglomerado','Cidade','UF','Data','Ativo Total','Carteira de Crédito Classificada','Passivo Circulante e Exigível a Longo Prazo e Resultados de Exercícios Futuros','Captações','Patrimônio Líquido','Lucro Líquido','Número de Agências','Número de Postos de Atendimento']
+folders = [f for f in os.listdir(indir) if os.path.isdir(indir+f)]
+tablename = 'dados_banco_central.resumo_stg'
+
+DATABASE, HOST, USER, PASSWORD = credentials.setDatabaseLogin()
 
 ### funcao que cria data no formato banco de dados
 def parse_date(date):
@@ -62,7 +69,7 @@ def norm_banks(bankname):
         name = name.replace('INTERMEDIUM', 'INTER').replace('BANCO INTER','INTER')
         name = name.replace('PANAMERICANO', 'PAN').replace('BANCO PAN', 'PAN')
         name = name.replace('BONSUCESSO', 'BS2').replace('BANCO BS2', 'BS2').replace('GRUPO BS2 BS2','BS2')
-        name = name.replace('BANCO NOSSA CAIXA', 'CAIXA ECONOMICA FEDERAL').replace('CAIXA ECONÔMICA FEDERAL', 'CAIXA ECONOMICA FEDERAL')
+        name = name.replace('CAIXA ECONÔMICA FEDERAL', 'CAIXA ECONOMICA FEDERAL')
         name = name.replace('SANTANDER BANESPA', 'SANTANDER')
         name = name.replace('HSBC BANK BRASIL BANCO MULTIPLO', 'HSBC')
         name = name.replace('BANCO DAYCOVAL','DAYCOVAL')
@@ -104,7 +111,7 @@ with open(outdir+new_file,'w', newline="\n", encoding="utf-8") as ofile:
         reader = csv.reader(ifile, delimiter=';')    
         for row in reader:
             try:
-                if not row[1] or row[-3] in ('NI','NA'):
+                if not row[1] or row[-3] in ('NI','NA') or "??? area" in row:
                     continue
                 if not row[2]:
                     row[2] = norm_banks(row[0]) ### preenche conglomerado com campo instituiçao financeira
@@ -119,3 +126,19 @@ with open(outdir+new_file,'w', newline="\n", encoding="utf-8") as ofile:
                 print('Error in line:\n{}\n'.format(row))
                 pass
 os.remove(outdir+new_file+'_aux')
+
+### conecta no banco de dados
+db_conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(DATABASE, USER, HOST, PASSWORD))
+cursor = db_conn.cursor()
+print('Connected to the database')
+### copy
+with open(outdir+new_file, 'r') as ifile:
+    SQL_STATEMENT = "COPY %s FROM STDIN WITH CSV DELIMITER AS ';' NULL AS ''"
+    print("Executing Copy in "+tablename)
+    cursor.copy_expert(sql=SQL_STATEMENT % tablename, file=ifile)
+    db_conn.commit()
+cursor.close()
+db_conn.close()
+
+### VACUUM ANALYZE
+call('psql -d torkcapital -c "VACUUM VERBOSE ANALYZE '+tablename+'";',shell=True)
