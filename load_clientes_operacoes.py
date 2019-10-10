@@ -33,7 +33,7 @@ def norm_banks(bankname):
     name = bankname.upper().replace(' (CONGLOMERADO)','')
     name = name.replace('-','').replace(',','')
     name = name.replace('S.A.','').replace('S A','').replace('S/A','').replace('S.A','')
-    name = name.replace('LTDA.','')
+    name = name.replace('LTDA.','')replace('LTDA','')
     name = name.replace('CRÉDITO FINANCIAMENTO E INVESTIMENTO','').replace('CREDITO FINANCIAMENTO E INVESTIMENTO','').replace('CREDITO FINANCIAMENTO E INVESTIMENTOS','')
     name = name.replace('SOCIEDADE DE','')
     name = name.replace('FINANCIADORA','')
@@ -62,6 +62,8 @@ def norm_banks(bankname):
         name = 'CREDJUST'
     elif name.startswith('NU '):
         name = 'NUBANK'
+    elif 'XP INVESTIMENTOS' in name:
+        name = 'XP INVESTIMENTOS'
     elif name.startswith('COOPERATIVA') and name[-2] == '-':
         name = name[-1]
     else:
@@ -76,7 +78,6 @@ def norm_banks(bankname):
         name = name.replace('BANCO CITIBANK','CITIBANK')
         name = name.replace('BANCO ORIGINAL','ORIGINAL')
         name = name.replace('PAGSEGURO INTERNET','PAGSEGURO')
-        name = name.replace('PAGSEGURO INTERNET','PAGSEGURO')
         name = name.replace('BANCO BMC','BMC')
         name = name.replace('ABCBRASIL','ABC-BRASIL')
         name = name.replace('BANCO BGN','BGN')
@@ -87,7 +88,10 @@ def norm_banks(bankname):
         name = name.replace('BANCO DO ESTADO DO PARÁ','BANCO DO ESTADO DO PARA')
         name = name.replace('BANCO DE TOKYO MITSUBISHI UFJ BRASIL','BANCO DE TOKYOMITSUBISHI UFJ BRASIL')
         name = name.replace('BANCO A J RENNER','BANCO RENNER').replace('BANCO A.J. RENNER','BANCO RENNER')
+        name = name.replace('BANCO PORTO REAL DE INVESTIMENTO','BANCO PORTO REAL DE INVESTIMENTOS')
         name = name.replace('BANCO BM&FBOVESPA DE SERVIÇOS DE LIQUIDAÇÃO E CUSTÓDIA','BANCO BM&FBOVESPA').replace('BANCO BM FBOVESPA DE SERVICOS DE LIQUIDACAO E CUSTODIA','BANCO BM&FBOVESPA')
+        name = name.replace('BANCO ABN AMRO','ABN AMRO')
+        name = name.replace('MÚLTIPLA','MULTIPLA')
         
     if name.endswith(' S'):
         name = name[:-2]

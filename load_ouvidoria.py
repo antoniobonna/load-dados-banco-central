@@ -58,6 +58,8 @@ def norm_banks(bankname):
     name = name.replace('BANCO BGN','BGN')
     name = name.replace('ABCBRASIL','ABC-BRASIL')
     name = name.replace('BANCO A J RENNER','BANCO RENNER').replace('BANCO A.J. RENNER','BANCO RENNER')
+    name = name.replace('BANCO ABN AMRO','ABN AMRO')
+    name = name.replace('PARANA BANCO','PARANÁ BANCO') 
     
     return name
 

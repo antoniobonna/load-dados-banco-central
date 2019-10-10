@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct  4 16:49:30 2019
+Created on Fri Oct  4 17:33:21 2019
 
 @author: abonna
 """
@@ -15,10 +15,10 @@ from subprocess import call
 ### Definicao das variaveis
 indir = '/home/ubuntu/dump/dados_banco_central/if.data/'
 outdir = '/home/ubuntu/scripts/load-dados-banco-central/parsed/'
-new_file = 'credito_regiao.csv'
-files = [f for f in os.listdir(indir) if os.path.isfile(indir+f) and 'credito_regiao' in f]
-columns = ['Instituição financeira','Código','Segmento','Cidade','UF','Data','Total Geral','Sudeste','Centro-oeste','Nordeste','Norte','Sul','Região não Informada','Total Exterior']
-tablename = 'dados_banco_central.credito_regiao_stg'
+new_file = 'pj_porte.csv'
+files = [f for f in os.listdir(indir) if os.path.isfile(indir+f) and 'pj_porte' in f]
+columns = ['Instituição financeira','Código','Segmento','Cidade','UF','Data','Total da Carteira de Pessoa Jurídica','Micro','Pequena','Média','Grande','Indisponível','Total não Individualizado Pessoa Jurídica','Total Exterior Pessoa Jurídica']
+tablename = 'dados_banco_central.pj_porte_stg'
 
 DATABASE, HOST, USER, PASSWORD = credentials.setDatabaseLogin()
 

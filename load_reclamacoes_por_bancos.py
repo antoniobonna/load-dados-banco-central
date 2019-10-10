@@ -76,6 +76,7 @@ def norm_banks(bankname):
         name = name.replace('BANCO DO ESTADO DO PARÁ','BANCO DO ESTADO DO PARA')
         name = name.replace('BANCO DE TOKYO MITSUBISHI UFJ BRASIL','BANCO DE TOKYOMITSUBISHI UFJ BRASIL')
         name = name.replace('BANCO A J RENNER','BANCO RENNER').replace('BANCO A.J. RENNER','BANCO RENNER')
+        name = name.replace('BANCO ABN AMRO','ABN AMRO')
         name = name.replace('BANCO BM&FBOVESPA DE SERVIÇOS DE LIQUIDAÇÃO E CUSTÓDIA','BANCO BM&FBOVESPA').replace('BANCO BM FBOVESPA DE SERVICOS DE LIQUIDACAO E CUSTODIA','BANCO BM&FBOVESPA')
     if name.endswith(' S'):
         name = name[:-2]
@@ -97,7 +98,7 @@ with open(outdir+new_file,'w', newline="\n", encoding="utf-8") as ofile:
                 del row[2]
                 row[2] = norm_banks(row[2])
                 ### padrao numerico ENG-US
-                row[2:] = [r.replace('.','').replace(',','.').replace(' ','') for r in row[2:]]
+                row[3:] = [r.replace('.','').replace(',','.').replace(' ','') for r in row[3:]]
                 row.insert(0,date)
                 writer.writerow(row)
 ### conecta no banco de dados

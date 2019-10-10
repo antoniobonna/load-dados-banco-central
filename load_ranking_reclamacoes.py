@@ -59,6 +59,9 @@ def norm_banks(bankname):
     name = name.replace('BANCO DAYCOVAL','DAYCOVAL')
     name = name.replace('BANCO CITIBANK','CITIBANK')
     name = name.replace('ABCBRASIL','ABC-BRASIL')
+    name = name.replace('BANCO ABN AMRO','ABN AMRO')
+    name = name.replace('PARANA BANCO','PARANÁ BANCO')
+    name = name.replace('PARANA SAFRA','SAFRA') 
     
     return name
 

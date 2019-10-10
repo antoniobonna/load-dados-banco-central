@@ -76,6 +76,7 @@ def norm_banks(bankname):
         name = name.replace('BANCO DO ESTADO DO PARÁ','BANCO DO ESTADO DO PARA')
         name = name.replace('BANCO DE TOKYO MITSUBISHI UFJ BRASIL','BANCO DE TOKYOMITSUBISHI UFJ BRASIL')
         name = name.replace('BANCO A J RENNER','BANCO RENNER').replace('BANCO A.J. RENNER','BANCO RENNER')
+        name = name.replace('BANCO ABN AMRO','ABN AMRO')
         name = name.replace('BANCO BM&FBOVESPA DE SERVIÇOS DE LIQUIDAÇÃO E CUSTÓDIA','BANCO BM&FBOVESPA').replace('BANCO BM FBOVESPA DE SERVICOS DE LIQUIDACAO E CUSTODIA','BANCO BM&FBOVESPA')
     if name.endswith(' S'):
         name = name[:-2]
